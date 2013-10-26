@@ -13,6 +13,12 @@ class IndexHandler(tornado.web.RequestHandler):
         self.write("Hello, world!")
 
 
+class RobotsHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.set_header('Content-Type', 'text/plain')
+        self.write('User-agent: *\nDisallow: /')
+
+
 class SpreadsheetHandler(tornado.web.RequestHandler):
     @tornado.web.addslash
     def get(self, key):
@@ -26,6 +32,7 @@ class SpreadsheetHandler(tornado.web.RequestHandler):
 
 application = tornado.web.Application([
     (r'/(\w+)/?', SpreadsheetHandler),
+    (r'/robots.txt', RobotsHandler),
     (r'/', IndexHandler),
 ], debug=True)
 
