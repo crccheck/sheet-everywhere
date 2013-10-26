@@ -14,6 +14,7 @@ class IndexHandler(tornado.web.RequestHandler):
 
 
 class SpreadsheetHandler(tornado.web.RequestHandler):
+    @tornado.web.addslash
     def get(self, key):
         try:
             sheet = GSpreadsheet(key=key)
@@ -24,7 +25,7 @@ class SpreadsheetHandler(tornado.web.RequestHandler):
 
 
 application = tornado.web.Application([
-    (r'/(\w+)/', SpreadsheetHandler),
+    (r'/(\w+)/?', SpreadsheetHandler),
     (r'/', IndexHandler),
 ], debug=True)
 
