@@ -31,10 +31,13 @@ class SpreadsheetHandler(tornado.web.RequestHandler):
 
 
 application = tornado.web.Application([
-    (r'/(\w+)/?', SpreadsheetHandler),
-    (r'/robots.txt', RobotsHandler),
-    (r'/', IndexHandler),
-], debug=True)
+        (r'/(\w+)/?', SpreadsheetHandler),
+        (r'/robots.txt', RobotsHandler),
+        (r'/', IndexHandler),
+    ],
+    debug=True,
+    gzip=True,
+)
 
 
 if __name__ == "__main__":
