@@ -35,7 +35,7 @@ application = tornado.web.Application([
         (r'/robots.txt', RobotsHandler),
         (r'/', IndexHandler),
     ],
-    debug=True,
+    # debug=True,
     gzip=True,
 )
 
