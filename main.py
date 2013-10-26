@@ -26,8 +26,15 @@ class SpreadsheetHandler(tornado.web.RequestHandler):
             sheet = GSpreadsheet(key=key)
         except RequestError:
             raise tornado.web.HTTPError(404, u'Spreadsheet Not Found')
-        self.set_header("Content-Type", "application/json")
-        self.write(json.dumps(list((x.copy() for x in sheet))))
+        output = json.dumps(list((x.copy() for x in sheet)))
+        callback = self.get_argument('callback', None)
+        if callback:
+            # return jsonp version
+            output = '{0}({1})'.format(callback, output)
+            self.set_header("Content-Type", "application/javascript")
+        else:
+            self.set_header("Content-Type", "application/json")
+        self.write(output)
 
 
 application = tornado.web.Application([
