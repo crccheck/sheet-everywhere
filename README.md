@@ -13,6 +13,10 @@ resource like:
 
 > http://sheet-everywhere.herokuapp.com/0AvtWFMTdBQSLdFI3Y2M0RnI5OTBMa2FydXNFelBDTUE/
 
+And if you need a specific worksheet, add the `gid` as a get parameter:
+
+> http://sheet-everywhere.herokuapp.com/0AvtWFMTdBQSLdFI3Y2M0RnI5OTBMa2FydXNFelBDTUE/?gid=1
+
 The spreadsheet must be publicly accessible.
 
 ## Developing

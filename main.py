@@ -43,20 +43,28 @@ class RobotsHandler(tornado.web.RequestHandler):
 class SpreadsheetHandler(tornado.web.RequestHandler):
     @tornado.web.addslash
     def get(self, key):
+        gid = self.get_argument('gid', 0)
+        cache_key = u'{}#{}'.format(key, gid)
         # TODO add cache invalidation
-        output = region.get(key)
+        output = region.get(cache_key)
         if output == NOT_FOUND:
             raise tornado.web.HTTPError(404, u'Spreadsheet Not Found (cached)')
 
         if not output:
             try:
-                sheet = GSpreadsheet(key=key)
+                worksheet = int(gid) + 1
+                sheet = GSpreadsheet(key=key, worksheet=worksheet)
             except RequestError:
-                region.set(key, NOT_FOUND)
+                region.set(cache_key, NOT_FOUND)
                 raise tornado.web.HTTPError(404, u'Spreadsheet Not Found')
+            except ValueError:
+                # TODO show invalid gid help message?
+                region.set(cache_key, NOT_FOUND)
+                raise tornado.web.HTTPError(404,
+                        u'Spreadsheet/Worksheet Not Found')
             output = json.dumps(list((x.copy() for x in sheet)))
 
-        region.set(key, output)
+        region.set(cache_key, output)
         callback = self.get_argument('callback', None)
         if callback:
             # return jsonp version
