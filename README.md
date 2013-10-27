@@ -11,7 +11,7 @@ You can try the reference implementation hosted on Heroku at:
 Use the key of the spreadsheet (found in the url) to miracle it into a JSON
 resource like:
 
-> http://sheet-everywhere.herokuapp.com//0AvtWFMTdBQSLdFI3Y2M0RnI5OTBMa2FydXNFelBDTUE/
+> http://sheet-everywhere.herokuapp.com/0AvtWFMTdBQSLdFI3Y2M0RnI5OTBMa2FydXNFelBDTUE/
 
 The spreadsheet must be publicly accessible.
 
