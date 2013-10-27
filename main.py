@@ -29,8 +29,9 @@ else:
 
 class IndexHandler(tornado.web.RequestHandler):
     def get(self):
-        # TODO write templates/index.html
-        self.write("Hello, world!")
+        import markdown
+        with open('README.md') as f:
+            self.write(markdown.markdown(f.read()))
 
 
 class RobotsHandler(tornado.web.RequestHandler):
