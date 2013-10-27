@@ -10,7 +10,11 @@ import tornado.web
 NOT_FOUND = False
 
 region = make_region().configure(
-    'dogpile.cache.memory',
+    'dogpile.cache.redis',
+    expiration_time=300,  # five minutes
+    arguments={
+        'url': 'redis://localhost',
+    }
 )
 
 
