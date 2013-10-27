@@ -73,7 +73,7 @@ if __name__ == "__main__":
     parse_command_line()
 
     application = tornado.web.Application([
-            (r'/(\w+)/?', SpreadsheetHandler),
+            (r'/([\-\w]+)/?', SpreadsheetHandler),
             (r'/robots.txt', RobotsHandler),
             (r'/', IndexHandler),
         ],
