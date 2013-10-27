@@ -1,4 +1,5 @@
 import json
+import os
 
 from dogpile.cache import make_region
 from gdata.service import RequestError
@@ -9,13 +10,21 @@ import tornado.web
 
 NOT_FOUND = False
 
-region = make_region().configure(
-    'dogpile.cache.redis',
-    expiration_time=300,  # five minutes
-    arguments={
-        'url': 'redis://localhost',
-    }
-)
+# `heroku addons:add redistogo:nano`
+redis_url = os.environ.get('REDISTOGO_URL')
+if redis_url:
+    region = make_region().configure(
+        'dogpile.cache.redis',
+        expiration_time=300,  # five minutes
+        arguments={
+            'url': redis_url,
+        },
+    )
+else:
+    region = make_region().configure(
+        'dogpile.cache.memory',
+        expiration_time=300,  # five minutes
+    )
 
 
 class IndexHandler(tornado.web.RequestHandler):
