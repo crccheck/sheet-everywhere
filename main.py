@@ -1,10 +1,30 @@
 import json
+import os
 
+from dogpile.cache import make_region
 from gdata.service import RequestError
 from gspreadsheet import GSpreadsheet
 from tornado.options import define, options, parse_command_line
 import tornado.ioloop
 import tornado.web
+
+NOT_FOUND = False
+
+# `heroku addons:add redistogo:nano`
+redis_url = os.environ.get('REDISTOGO_URL')
+if redis_url:
+    region = make_region().configure(
+        'dogpile.cache.redis',
+        expiration_time=300,  # five minutes
+        arguments={
+            'url': redis_url,
+        },
+    )
+else:
+    region = make_region().configure(
+        'dogpile.cache.memory',
+        expiration_time=300,  # five minutes
+    )
 
 
 class IndexHandler(tornado.web.RequestHandler):
@@ -22,11 +42,20 @@ class RobotsHandler(tornado.web.RequestHandler):
 class SpreadsheetHandler(tornado.web.RequestHandler):
     @tornado.web.addslash
     def get(self, key):
-        try:
-            sheet = GSpreadsheet(key=key)
-        except RequestError:
-            raise tornado.web.HTTPError(404, u'Spreadsheet Not Found')
-        output = json.dumps(list((x.copy() for x in sheet)))
+        # TODO add cache invalidation
+        output = region.get(key)
+        if output == NOT_FOUND:
+            raise tornado.web.HTTPError(404, u'Spreadsheet Not Found (cached)')
+
+        if not output:
+            try:
+                sheet = GSpreadsheet(key=key)
+            except RequestError:
+                region.set(key, NOT_FOUND)
+                raise tornado.web.HTTPError(404, u'Spreadsheet Not Found')
+            output = json.dumps(list((x.copy() for x in sheet)))
+
+        region.set(key, output)
         callback = self.get_argument('callback', None)
         if callback:
             # return jsonp version
@@ -37,18 +66,19 @@ class SpreadsheetHandler(tornado.web.RequestHandler):
         self.write(output)
 
 
-application = tornado.web.Application([
-        (r'/(\w+)/?', SpreadsheetHandler),
-        (r'/robots.txt', RobotsHandler),
-        (r'/', IndexHandler),
-    ],
-    # debug=True,
-    gzip=True,
-)
-
-
 if __name__ == "__main__":
     define("port", default=5000, help="run on the given port")
+    define("debug", default=False, help="enable debug mode")
     parse_command_line()
+
+    application = tornado.web.Application([
+            (r'/(\w+)/?', SpreadsheetHandler),
+            (r'/robots.txt', RobotsHandler),
+            (r'/', IndexHandler),
+        ],
+        debug=options.debug,
+        gzip=True,
+    )
+
     application.listen(options.port)
     tornado.ioloop.IOLoop.instance().start()
