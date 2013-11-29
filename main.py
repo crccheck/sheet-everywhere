@@ -45,7 +45,10 @@ class SpreadsheetHandler(tornado.web.RequestHandler):
     def get(self, key):
         gid = self.get_argument('gid', 0)
         cache_key = u'{}#{}'.format(key, gid)
-        # TODO add cache invalidation
+        # TODO add better cache invalidation
+        # XXX hack a way to invalidate cache key
+        if self.get_argument('forget'):
+            region.delete(cache_key)
         output = region.get(cache_key)
         if output == NOT_FOUND:
             raise tornado.web.HTTPError(404, u'Spreadsheet Not Found (cached)')
