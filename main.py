@@ -47,7 +47,7 @@ class SpreadsheetHandler(tornado.web.RequestHandler):
         cache_key = u'{}#{}'.format(key, gid)
         # TODO add better cache invalidation
         # XXX hack a way to invalidate cache key
-        if self.get_argument('forget'):
+        if self.get_argument('forget', None):
             region.delete(cache_key)
         output = region.get(cache_key)
         if output == NOT_FOUND:
