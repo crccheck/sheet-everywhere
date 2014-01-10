@@ -19,6 +19,14 @@ And if you need a specific worksheet, add the `gid` as a get parameter:
 
 The spreadsheet must be publicly accessible.
 
+
+## Problem[?](http://cl.ly/BG7R/trollface.jpg)
+
+### It's not working!
+Sharing permissions must be at least "Anyone who has the link can view". If it still doesn't
+show, make sure it's been published. To do that, navigate to File -> Publish to the web...,
+and start publishing.
+
 ## Developing
 
 Getting started:
